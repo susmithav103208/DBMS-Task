@@ -1,0 +1,43 @@
+Software Requirements Specification (SRS) for Savana App
+
+Introduction
+
+Savana is an online fashion shopping platform that offers trendy clothing, footwear, accessories, and lifestyle products for customers. The application allows users to browse products, add items to their cart or wishlist, place orders, make secure online payments, and track deliveries. Savana aims to provide a smooth, personalized, and convenient shopping experience through its user-friendly interface and fast delivery services.
+
+Functional Requirements
+
+Functional requirements describe the features that the Savana application must provide.
+
+User registration and login.
+Browse and search products by category, brand, size, color, and price.
+View detailed product information, including images, descriptions, sizes, and customer reviews.
+Add products to the shopping cart.
+Add or remove products from the wishlist.
+Place and manage orders.
+Make secure online payments using multiple payment methods.
+Track order status and delivery updates.
+View order history and download invoices.
+Apply discount coupons and promotional offers.
+Receive notifications about orders, offers, and new arrivals.
+Manage user profile, addresses, and payment information.
+Rate and review purchased products.
+Customer support through chat, email, or help center.
+Admin can manage users, products, categories, inventory, orders, discounts, and reports.
+Non-Functional Requirements
+
+Non-functional requirements
+
+Performance: Product pages, search results, and checkout should load quickly.
+Security: User accounts, personal information, and payment details must be securely protected.
+Availability: The application should be available 24/7 with minimal downtime.
+Scalability: The system should support a large number of users, products, and transactions simultaneously.
+Reliability: Orders, payments, and inventory information should remain accurate and consistent.
+Usability: The interface should be simple, attractive, responsive, and easy to navigate.
+Compatibility: The application should work smoothly on Android, iOS, and modern web browsers.
+Maintainability: The system should be easy to update, maintain, and improve.
+Data Backup and Recovery: Customer, product, and transaction data should be backed up regularly.
+Response Time: Product searches, order tracking, and payment confirmations should be displayed within a few seconds.
+
+Conclusion
+
+Functional and non-functional requirements are essential for the successful development of the Savana application. Functional requirements ensure that customers can easily browse products, place orders, make secure payments, and track deliveries. Non-functional requirements ensure that the platform remains secure, reliable, fast, and user-friendly. Together, these requirements help Savana provide an efficient, scalable, and enjoyable online fashion shopping experience.
