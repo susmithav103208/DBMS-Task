@@ -1,0 +1,124 @@
+CREATE DATABASE IF NOT EXISTS EcommerceQueryDB;
+
+USE EcommerceQueryDB;
+
+CREATE TABLE Customer (
+    Customer_ID INT PRIMARY KEY AUTO_INCREMENT,
+    Customer_Name VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) UNIQUE,
+    City VARCHAR(50)
+);
+
+CREATE TABLE Product (
+    Product_ID INT PRIMARY KEY AUTO_INCREMENT,
+    Product_Name VARCHAR(100) NOT NULL,
+    Category VARCHAR(50),
+    Price DECIMAL(10,2),
+    Stock INT
+);
+
+CREATE TABLE Orders (
+    Order_ID INT PRIMARY KEY AUTO_INCREMENT,
+    Customer_ID INT NOT NULL,
+    Product_ID INT NOT NULL,
+    Quantity INT,
+    Order_Date DATE,
+    FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID),
+    FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID)
+);
+
+INSERT INTO Customer (Customer_Name, Email, City) VALUES
+('Arun Kumar', 'arun@gmail.com', 'Chennai'),
+('Priya Sharma', 'priya@gmail.com', 'Tambaram'),
+('Rahul Raj', 'rahul@gmail.com', 'Pallavaram'),
+('Divya S', 'divya@gmail.com', 'Chromepet');
+
+INSERT INTO Product (Product_Name, Category, Price, Stock) VALUES
+('Laptop', 'Electronics', 55000.00, 10),
+('Keyboard', 'Electronics', 1200.00, 25),
+('Mouse', 'Electronics', 700.00, 30),
+('Headphones', 'Electronics', 2500.00, 20),
+('Notebook', 'Stationery', 100.00, 50),
+('School Bag', 'Accessories', 1500.00, 0);
+
+INSERT INTO Orders (Customer_ID, Product_ID, Quantity, Order_Date) VALUES
+(1, 1, 1, '2026-09-10'),
+(2, 2, 2, '2026-09-11'),
+(3, 3, 1, '2026-09-12'),
+(4, 4, 1, '2026-09-13'),
+(1, 5, 5, '2026-09-14');
+
+SELECT * FROM Product;
+
+SELECT Product_Name, Price
+FROM Product;
+
+SELECT * FROM Product
+WHERE Price > 1000;
+
+SELECT * FROM Product
+WHERE Category = 'Electronics';
+
+SELECT * FROM Product
+WHERE Stock > 0;
+
+SELECT * FROM Product
+WHERE Stock = 0;
+
+SELECT * FROM Product
+ORDER BY Price ASC;
+
+SELECT * FROM Product
+ORDER BY Price DESC;
+
+SELECT DISTINCT Category
+FROM Product;
+
+SELECT DISTINCT City
+FROM Customer;
+
+SELECT * FROM Product
+WHERE Price BETWEEN 500 AND 3000;
+
+SELECT * FROM Product
+WHERE Category = 'Electronics'
+AND Price < 3000;
+
+SELECT * FROM Product
+WHERE Stock > 0
+AND Price < 5000;
+
+SELECT * FROM Product
+WHERE Product_Name LIKE '%phone%';
+
+SELECT Customer_ID, Customer_Name, Email, City
+FROM Customer;
+
+SELECT o.Order_ID, c.Customer_Name, p.Product_Name, o.Quantity, o.Order_Date
+FROM Orders o
+JOIN Customer c ON o.Customer_ID = c.Customer_ID
+JOIN Product p ON o.Product_ID = p.Product_ID;
+
+SELECT p.Category, COUNT(p.Product_ID) AS Total_Products
+FROM Product p
+GROUP BY p.Category;
+
+SELECT p.Category, AVG(p.Price) AS Average_Price
+FROM Product p
+GROUP BY p.Category;
+
+SELECT p.Product_Name, p.Price, p.Stock
+FROM Product p
+WHERE p.Stock > 0
+ORDER BY p.Price DESC;
+
+SELECT c.Customer_Name, COUNT(o.Order_ID) AS Total_Orders
+FROM Customer c
+LEFT JOIN Orders o ON c.Customer_ID = o.Customer_ID
+GROUP BY c.Customer_ID, c.Customer_Name;
+
+SELECT p.Product_Name, SUM(o.Quantity) AS Total_Quantity_Sold
+FROM Product p
+JOIN Orders o ON p.Product_ID = o.Product_ID
+GROUP BY p.Product_ID, p.Product_Name
+ORDER BY Total_Quantity_Sold DESC;
