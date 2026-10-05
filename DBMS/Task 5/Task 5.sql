@@ -1,49 +1,170 @@
-CREATE DATABASE IF NOT EXISTS PaymentTransactionDB;
+DROP DATABASE IF EXISTS ECommercePaymentDB;
 
-USE PaymentTransactionDB;
+CREATE DATABASE ECommercePaymentDB;
 
-CREATE TABLE Customer (Customer_ID INT PRIMARY KEY AUTO_INCREMENT, Customer_Name VARCHAR(100) NOT NULL, Email VARCHAR(100) UNIQUE, Phone VARCHAR(15));
+USE ECommercePaymentDB;
 
-CREATE TABLE Orders (Order_ID INT PRIMARY KEY AUTO_INCREMENT, Customer_ID INT NOT NULL, Order_Date DATE NOT NULL, Total_Amount DECIMAL(10,2) NOT NULL, FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID));
+CREATE TABLE Customers (
+    Customer_ID INT PRIMARY KEY AUTO_INCREMENT,
+    Customer_Name VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) UNIQUE NOT NULL,
+    Phone VARCHAR(15)
+);
 
-CREATE TABLE Payment (Payment_ID INT PRIMARY KEY AUTO_INCREMENT, Order_ID INT NOT NULL, Payment_Mode VARCHAR(30) NOT NULL, Payment_Date DATE NOT NULL, Payment_Amount DECIMAL(10,2) NOT NULL, Payment_Status VARCHAR(20) NOT NULL, Transaction_ID VARCHAR(50) UNIQUE, FOREIGN KEY (Order_ID) REFERENCES Orders(Order_ID));
+CREATE TABLE Orders (
+    Order_ID INT PRIMARY KEY AUTO_INCREMENT,
+    Customer_ID INT NOT NULL,
+    Order_Date DATE NOT NULL,
+    Total_Amount DECIMAL(10,2) NOT NULL,
+    Order_Status VARCHAR(20) DEFAULT 'Placed',
+    FOREIGN KEY (Customer_ID) REFERENCES Customers(Customer_ID)
+);
 
-INSERT INTO Customer (Customer_Name, Email, Phone) VALUES
-('Sushmita', 'sushmita@gmail.com', '9876543210'),('Priya', 'priya@gmail.com', '9876543211'),('Rahul', 'rahul@gmail.com', '9876543212'),('Anjali', 'anjali@gmail.com', '9876543213');
+CREATE TABLE Payment (
+    Payment_ID INT PRIMARY KEY AUTO_INCREMENT,
+    Order_ID INT NOT NULL,
+    Customer_ID INT NOT NULL,
+    Payment_Mode VARCHAR(30) NOT NULL,
+    Payment_Date DATE NOT NULL,
+    Amount DECIMAL(10,2) NOT NULL,
+    Payment_Status VARCHAR(20) NOT NULL,
+    FOREIGN KEY (Order_ID) REFERENCES Orders(Order_ID),
+    FOREIGN KEY (Customer_ID) REFERENCES Customers(Customer_ID)
+);
 
-INSERT INTO Orders (Customer_ID, Order_Date, Total_Amount) VALUES
-(1, '2026-09-10', 2500.00),(2, '2026-09-11', 5500.00),(3, '2026-09-12', 1200.00),(4, '2026-09-13', 3500.00),(1, '2026-09-14', 4200.00);
+INSERT INTO Customers
+(Customer_Name, Email, Phone)
+VALUES
+('Sangavi', 'sangavi@gmail.com', '9876543210'),
+('Rahul', 'rahul@gmail.com', '9876543211'),
+('Priya', 'priya@gmail.com', '9876543212'),
+('Arun', 'arun@gmail.com', '9876543213');
 
-INSERT INTO Payment (Order_ID, Payment_Mode, Payment_Date, Payment_Amount, Payment_Status, Transaction_ID) VALUES
-(1, 'UPI', '2026-09-10', 2500.00, 'Successful', 'TXN1001'),(2, 'Credit Card', '2026-09-11', 5500.00, 'Successful', 'TXN1002'),(3, 'Debit Card', '2026-09-12', 1200.00, 'Failed', 'TXN1003'),(4, 'Cash', '2026-09-13', 3500.00, 'Successful', 'TXN1004'),(5, 'UPI', '2026-09-14', 4200.00, 'Failed', 'TXN1005');
+INSERT INTO Orders
+(Customer_ID, Order_Date, Total_Amount, Order_Status)
+VALUES
+(1, '2026-09-01', 52000.00, 'Delivered'),
+(2, '2026-09-01', 3500.00, 'Shipped'),
+(1, '2026-09-02', 25800.00, 'Placed'),
+(3, '2026-09-02', 2000.00, 'Placed'),
+(4, '2026-09-02', 15000.00, 'Placed');
 
-SELECT * FROM Customer;
+INSERT INTO Payment
+(Order_ID, Customer_ID, Payment_Mode, Payment_Date, Amount, Payment_Status)
+VALUES
+(1, 1, 'Credit Card', '2026-09-01', 52000.00, 'Successful'),
+(2, 2, 'UPI', '2026-09-01', 3500.00, 'Successful'),
+(3, 1, 'Debit Card', '2026-09-02', 25800.00, 'Failed'),
+(4, 3, 'Cash on Delivery', '2026-09-02', 2000.00, 'Pending'),
+(5, 4, 'UPI', '2026-09-02', 15000.00, 'Successful');
+
+SELECT * FROM Customers;
+
 SELECT * FROM Orders;
+
 SELECT * FROM Payment;
 
-SELECT p.Payment_ID, o.Order_ID, c.Customer_Name, p.Payment_Mode, p.Payment_Date, p.Payment_Amount, p.Payment_Status, p.Transaction_ID
-FROM Payment p JOIN Orders o ON p.Order_ID = o.Order_ID JOIN Customer c ON o.Customer_ID = c.Customer_ID;
+UPDATE Payment
+SET Payment_Status = 'Successful'
+WHERE Payment_ID = 3;
 
-SELECT p.Payment_ID, c.Customer_Name, p.Payment_Mode, p.Payment_Amount, p.Payment_Status
-FROM Payment p JOIN Orders o ON p.Order_ID = o.Order_ID JOIN Customer c ON o.Customer_ID = c.Customer_ID
-WHERE p.Payment_Status = 'Successful';
+UPDATE Payment
+SET Payment_Mode = 'UPI'
+WHERE Payment_ID = 3;
 
-SELECT p.Payment_ID, c.Customer_Name, p.Payment_Mode, p.Payment_Amount, p.Payment_Status
-FROM Payment p JOIN Orders o ON p.Order_ID = o.Order_ID JOIN Customer c ON o.Customer_ID = c.Customer_ID
-WHERE p.Payment_Status = 'Failed';
+SELECT
+    Payment_ID,
+    Order_ID,
+    Customer_ID,
+    Payment_Mode,
+    Payment_Date,
+    Amount,
+    Payment_Status
+FROM Payment
+WHERE Payment_Status = 'Successful';
 
-SELECT Payment_Mode, COUNT(*) AS Total_Transactions FROM Payment GROUP BY Payment_Mode;
-SELECT Payment_Mode, COUNT(*) AS Successful_Transactions FROM Payment WHERE Payment_Status = 'Successful' GROUP BY Payment_Mode;
-SELECT Payment_Mode, SUM(Payment_Amount) AS Total_Amount FROM Payment WHERE Payment_Status = 'Successful' GROUP BY Payment_Mode;
-SELECT Payment_Status, COUNT(*) AS Transaction_Count FROM Payment GROUP BY Payment_Status;
-SELECT Payment_Status, SUM(Payment_Amount) AS Total_Amount FROM Payment GROUP BY Payment_Status;
+SELECT
+    Payment_ID,
+    Order_ID,
+    Customer_ID,
+    Payment_Mode,
+    Payment_Date,
+    Amount,
+    Payment_Status
+FROM Payment
+WHERE Payment_Status = 'Failed';
 
-SELECT c.Customer_Name, o.Order_ID, o.Order_Date, p.Payment_Mode, p.Payment_Amount, p.Payment_Status, p.Transaction_ID
-FROM Customer c JOIN Orders o ON c.Customer_ID = o.Customer_ID JOIN Payment p ON o.Order_ID = p.Order_ID
+SELECT
+    Payment_Mode,
+    COUNT(*) AS Number_of_Transactions
+FROM Payment
+GROUP BY Payment_Mode;
+
+SELECT
+    Payment_Mode,
+    SUM(Amount) AS Total_Amount
+FROM Payment
+WHERE Payment_Status = 'Successful'
+GROUP BY Payment_Mode;
+
+SELECT
+    Payment_Status,
+    COUNT(*) AS Number_of_Transactions
+FROM Payment
+GROUP BY Payment_Status;
+
+SELECT
+    c.Customer_ID,
+    c.Customer_Name,
+    p.Payment_ID,
+    p.Order_ID,
+    p.Payment_Mode,
+    p.Payment_Date,
+    p.Amount,
+    p.Payment_Status
+FROM Customers c
+JOIN Payment p
+ON c.Customer_ID = p.Customer_ID
 ORDER BY p.Payment_Date DESC;
 
-UPDATE Payment SET Payment_Status = 'Successful' WHERE Payment_ID = 3;
-
-SELECT p.Payment_ID, c.Customer_Name, o.Order_ID, p.Payment_Mode, p.Payment_Date, p.Payment_Amount, p.Payment_Status, p.Transaction_ID
-FROM Payment p JOIN Orders o ON p.Order_ID = o.Order_ID JOIN Customer c ON o.Customer_ID = c.Customer_ID
+SELECT
+    p.Payment_ID,
+    c.Customer_Name,
+    o.Order_ID,
+    o.Order_Date,
+    o.Total_Amount,
+    p.Payment_Mode,
+    p.Payment_Date,
+    p.Amount,
+    p.Payment_Status
+FROM Payment p
+JOIN Customers c
+ON p.Customer_ID = c.Customer_ID
+JOIN Orders o
+ON p.Order_ID = o.Order_ID
 ORDER BY p.Payment_Date DESC;
+
+SELECT
+    COUNT(*) AS Total_Transactions,
+    SUM(Amount) AS Total_Transaction_Amount
+FROM Payment;
+
+SELECT
+    COUNT(*) AS Successful_Transactions,
+    SUM(Amount) AS Successful_Amount
+FROM Payment
+WHERE Payment_Status = 'Successful';
+
+SELECT
+    COUNT(*) AS Failed_Transactions,
+    SUM(Amount) AS Failed_Amount
+FROM Payment
+WHERE Payment_Status = 'Failed';
+
+SELECT
+    Payment_Mode,
+    COUNT(*) AS Transactions,
+    SUM(Amount) AS Total_Amount
+FROM Payment
+GROUP BY Payment_Mode
+ORDER BY Transactions DESC;
