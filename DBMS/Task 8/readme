@@ -1,0 +1,203 @@
+SHOW DATABASES;
+DROP TABLE IF EXISTS Payment;
+DROP TABLE IF EXISTS Orders;
+DROP TABLE IF EXISTS Product;
+DROP TABLE IF EXISTS Customer;
+
+CREATE TABLE Customer (
+    Customer_ID INT PRIMARY KEY,
+    Customer_Name VARCHAR(100),
+    Email VARCHAR(100),
+    Phone VARCHAR(15)
+);
+
+CREATE TABLE Product (
+    Product_ID INT PRIMARY KEY,
+    Product_Name VARCHAR(100),
+    Price DECIMAL(10,2),
+    Category VARCHAR(50)
+);
+
+CREATE TABLE Orders (
+    Order_ID INT PRIMARY KEY,
+    Customer_ID INT,
+    Product_ID INT,
+    Order_Date DATE,
+    Quantity INT,
+    FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID),
+    FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID)
+);
+
+CREATE TABLE Payment (
+    Payment_ID INT PRIMARY KEY,
+    Order_ID INT,
+    Payment_Date DATE,
+    Payment_Status VARCHAR(30),
+    Payment_Amount DECIMAL(10,2),
+    FOREIGN KEY (Order_ID) REFERENCES Orders(Order_ID)
+);
+
+INSERT INTO Customer
+(Customer_ID, Customer_Name, Email, Phone)
+VALUES
+(101, 'Arun', 'arun@gmail.com', '9876543210'),
+(102, 'Priya', 'priya@gmail.com', '9876543211'),
+(103, 'Rahul', 'rahul@gmail.com', '9876543212'),
+(104, 'Divya', 'divya@gmail.com', '9876543213'),
+(105, 'Kavin', 'kavin@gmail.com', '9876543214');
+
+INSERT INTO Product
+(Product_ID, Product_Name, Price, Category)
+VALUES
+(201, 'Laptop', 55000.00, 'Electronics'),
+(202, 'Mobile Phone', 25000.00, 'Electronics'),
+(203, 'Headphones', 2500.00, 'Accessories'),
+(204, 'Keyboard', 1500.00, 'Accessories'),
+(205, 'Mouse', 800.00, 'Accessories');
+
+INSERT INTO Orders
+(Order_ID, Customer_ID, Product_ID, Order_Date, Quantity)
+VALUES
+(301, 101, 201, '2026-09-01', 1),
+(302, 102, 202, '2026-09-03', 1),
+(303, 103, 203, '2026-09-05', 2),
+(304, 101, 204, '2026-09-07', 1),
+(305, 104, 205, '2026-09-10', 2);
+
+INSERT INTO Payment
+(Payment_ID, Order_ID, Payment_Date, Payment_Status, Payment_Amount)
+VALUES
+(401, 301, '2026-09-01', 'Paid', 55000.00),
+(402, 302, '2026-09-03', 'Paid', 25000.00),
+(403, 303, '2026-09-05', 'Paid', 5000.00),
+(404, 304, '2026-09-07', 'Pending', 1500.00),
+(405, 305, '2026-09-10', 'Paid', 1600.00);
+
+SELECT * FROM Customer;
+
+SELECT * FROM Product;
+
+SELECT * FROM Orders;
+
+SELECT * FROM Payment;
+
+
+SELECT
+    c.Customer_ID,
+    c.Customer_Name,
+    o.Order_ID,
+    o.Order_Date,
+    p.Product_ID,
+    p.Product_Name,
+    o.Quantity,
+    pay.Payment_ID,
+    pay.Payment_Status,
+    pay.Payment_Amount
+FROM Customer c
+INNER JOIN Orders o
+    ON c.Customer_ID = o.Customer_ID
+INNER JOIN Product p
+    ON o.Product_ID = p.Product_ID
+INNER JOIN Payment pay
+    ON o.Order_ID = pay.Order_ID;
+
+
+SELECT
+    c.Customer_ID,
+    c.Customer_Name,
+    o.Order_ID,
+    o.Order_Date,
+    p.Product_Name,
+    o.Quantity
+FROM Customer c
+LEFT JOIN Orders o
+    ON c.Customer_ID = o.Customer_ID
+LEFT JOIN Product p
+    ON o.Product_ID = p.Product_ID;
+
+
+SELECT
+    o.Order_ID,
+    o.Order_Date,
+    c.Customer_Name,
+    p.Product_Name,
+    o.Quantity
+FROM Customer c
+RIGHT JOIN Orders o
+    ON c.Customer_ID = o.Customer_ID
+RIGHT JOIN Product p
+    ON o.Product_ID = p.Product_ID;
+
+
+SELECT
+    o.Order_ID,
+    o.Order_Date,
+    c.Customer_ID,
+    c.Customer_Name,
+    p.Product_ID,
+    p.Product_Name,
+    p.Price,
+    o.Quantity,
+    (p.Price * o.Quantity) AS Total_Amount,
+    pay.Payment_ID,
+    pay.Payment_Date,
+    pay.Payment_Status,
+    pay.Payment_Amount
+FROM Orders o
+INNER JOIN Customer c
+    ON o.Customer_ID = c.Customer_ID
+INNER JOIN Product p
+    ON o.Product_ID = p.Product_ID
+INNER JOIN Payment pay
+    ON o.Order_ID = pay.Order_ID;
+
+
+SELECT
+    c.Customer_ID,
+    c.Customer_Name,
+    o.Order_ID,
+    o.Order_Date,
+    p.Product_Name,
+    p.Price,
+    o.Quantity,
+    (p.Price * o.Quantity) AS Total_Amount
+FROM Customer c
+INNER JOIN Orders o
+    ON c.Customer_ID = o.Customer_ID
+INNER JOIN Product p
+    ON o.Product_ID = p.Product_ID
+ORDER BY c.Customer_ID, o.Order_Date;
+
+
+SELECT
+    c.Customer_ID,
+    c.Customer_Name,
+    COUNT(o.Order_ID) AS Total_Orders,
+    SUM(o.Quantity) AS Total_Quantity,
+    SUM(p.Price * o.Quantity) AS Total_Purchase_Amount
+FROM Customer c
+LEFT JOIN Orders o
+    ON c.Customer_ID = o.Customer_ID
+LEFT JOIN Product p
+    ON o.Product_ID = p.Product_ID
+GROUP BY c.Customer_ID, c.Customer_Name
+ORDER BY Total_Purchase_Amount DESC;
+
+
+SELECT
+    c.Customer_Name,
+    p.Product_Name,
+    o.Order_ID,
+    o.Order_Date,
+    o.Quantity,
+    p.Price,
+    (p.Price * o.Quantity) AS Total_Amount,
+    pay.Payment_Status
+FROM Customer c
+INNER JOIN Orders o
+    ON c.Customer_ID = o.Customer_ID
+INNER JOIN Product p
+    ON o.Product_ID = p.Product_ID
+INNER JOIN Payment pay
+    ON o.Order_ID = pay.Order_ID
+ORDER BY o.Order_ID;
