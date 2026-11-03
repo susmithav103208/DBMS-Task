@@ -1,0 +1,110 @@
+USE DBMS;
+
+SELECT
+    Product_ID,
+    Product_Name,
+    Price,
+    Category
+FROM Product
+WHERE Price > (
+    SELECT AVG(Price)
+    FROM Product
+)
+ORDER BY Price DESC;
+
+SELECT
+    c.Customer_ID,
+    c.Customer_Name,
+    SUM(p.Payment_Amount) AS Total_Purchase
+FROM Customer c
+INNER JOIN Orders o
+    ON c.Customer_ID = o.Customer_ID
+INNER JOIN Payment p
+    ON o.Order_ID = p.Order_ID
+WHERE p.Payment_Status = 'Paid'
+GROUP BY c.Customer_ID, c.Customer_Name
+HAVING SUM(p.Payment_Amount) = (
+    SELECT MAX(Customer_Total)
+    FROM (
+        SELECT
+            SUM(p2.Payment_Amount) AS Customer_Total
+        FROM Orders o2
+        INNER JOIN Payment p2
+            ON o2.Order_ID = p2.Order_ID
+        WHERE p2.Payment_Status = 'Paid'
+        GROUP BY o2.Customer_ID
+    ) AS Customer_Purchases
+);
+
+SELECT
+    p.Product_ID,
+    p.Product_Name,
+    p.Price,
+    p.Category
+FROM Product p
+WHERE EXISTS (
+    SELECT 1
+    FROM Orders o
+    WHERE o.Product_ID = p.Product_ID
+);
+
+SELECT
+    c.Customer_ID,
+    c.Customer_Name,
+    SUM(p.Payment_Amount) AS Total_Purchase
+FROM Customer c
+INNER JOIN Orders o
+    ON c.Customer_ID = o.Customer_ID
+INNER JOIN Payment p
+    ON o.Order_ID = p.Order_ID
+WHERE p.Payment_Status = 'Paid'
+GROUP BY c.Customer_ID, c.Customer_Name
+HAVING SUM(p.Payment_Amount) > (
+    SELECT AVG(Customer_Total)
+    FROM (
+        SELECT
+            SUM(p2.Payment_Amount) AS Customer_Total
+        FROM Orders o2
+        INNER JOIN Payment p2
+            ON o2.Order_ID = p2.Order_ID
+        WHERE p2.Payment_Status = 'Paid'
+        GROUP BY o2.Customer_ID
+    ) AS Average_Customer_Purchases
+)
+ORDER BY Total_Purchase DESC;
+
+SELECT
+    p.Product_ID,
+    p.Product_Name,
+    p.Category,
+    p.Price,
+    COALESCE(SUM(
+        CASE
+            WHEN pay.Payment_Status = 'Paid' THEN o.Quantity
+            ELSE 0
+        END
+    ), 0) AS Units_Sold,
+    COALESCE(SUM(
+        CASE
+            WHEN pay.Payment_Status = 'Paid' THEN pay.Payment_Amount
+            ELSE 0
+        END
+    ), 0) AS Total_Paid_Sales,
+    CASE
+        WHEN p.Price > (SELECT AVG(Price) FROM Product)
+            THEN 'Above Average Price'
+        WHEN p.Price < (SELECT AVG(Price) FROM Product)
+            THEN 'Below Average Price'
+        ELSE 'Average Price'
+    END AS Price_Comparison
+FROM Product p
+LEFT JOIN Orders o
+    ON p.Product_ID = o.Product_ID
+LEFT JOIN Payment pay
+    ON o.Order_ID = pay.Order_ID
+GROUP BY
+    p.Product_ID,
+    p.Product_Name,
+    p.Category,
+    p.Price
+ORDER BY Total_Paid_Sales DESC;
