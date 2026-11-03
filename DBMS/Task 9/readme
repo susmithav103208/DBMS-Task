@@ -1,3 +1,67 @@
+CREATE DATABASE IF NOT EXISTS DBMS;
+USE DBMS;
+
+CREATE TABLE IF NOT EXISTS Customer (
+    Customer_ID INT PRIMARY KEY,
+    Customer_Name VARCHAR(100),
+    Email VARCHAR(100),
+    Phone VARCHAR(15)
+);
+
+CREATE TABLE IF NOT EXISTS Product (
+    Product_ID INT PRIMARY KEY,
+    Product_Name VARCHAR(100),
+    Price DECIMAL(10,2),
+    Category VARCHAR(50)
+);
+
+CREATE TABLE IF NOT EXISTS Orders (
+    Order_ID INT PRIMARY KEY,
+    Customer_ID INT,
+    Product_ID INT,
+    Order_Date DATE,
+    Quantity INT,
+    FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID),
+    FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID)
+);
+
+CREATE TABLE IF NOT EXISTS Payment (
+    Payment_ID INT PRIMARY KEY,
+    Order_ID INT,
+    Payment_Date DATE,
+    Payment_Status VARCHAR(20),
+    Payment_Amount DECIMAL(10,2),
+    FOREIGN KEY (Order_ID) REFERENCES Orders(Order_ID)
+);
+
+INSERT IGNORE INTO Customer VALUES
+(101, 'Arun', 'arun@gmail.com', '9876543210'),
+(102, 'Priya', 'priya@gmail.com', '9876543211'),
+(103, 'Rahul', 'rahul@gmail.com', '9876543212'),
+(104, 'Divya', 'divya@gmail.com', '9876543213'),
+(105, 'Kavin', 'kavin@gmail.com', '9876543214');
+
+INSERT IGNORE INTO Product VALUES
+(201, 'Laptop', 55000, 'Electronics'),
+(202, 'Mobile Phone', 25000, 'Electronics'),
+(203, 'Headphones', 2500, 'Accessories'),
+(204, 'Keyboard', 1500, 'Accessories'),
+(205, 'Mouse', 800, 'Accessories');
+
+INSERT IGNORE INTO Orders VALUES
+(301, 101, 201, '2026-10-01', 1),
+(302, 102, 202, '2026-10-02', 1),
+(303, 103, 203, '2026-10-03', 2),
+(304, 104, 204, '2026-10-04', 1),
+(305, 105, 205, '2026-10-05', 2);
+
+INSERT IGNORE INTO Payment VALUES
+(401, 301, '2026-10-01', 'Paid', 55000),
+(402, 302, '2026-10-02', 'Paid', 25000),
+(403, 303, '2026-10-03', 'Paid', 5000),
+(404, 304, '2026-10-04', 'Pending', 1500),
+(405, 305, '2026-10-05', 'Paid', 1600);
+
 SELECT
     COUNT(*) AS Total_Orders,
     SUM(Payment_Amount) AS Total_Sales,
