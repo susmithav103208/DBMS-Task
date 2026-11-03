@@ -1,0 +1,58 @@
+SELECT
+    COUNT(*) AS Total_Orders,
+    SUM(Payment_Amount) AS Total_Sales,
+    AVG(Payment_Amount) AS Average_Sale,
+    MIN(Payment_Amount) AS Minimum_Sale,
+    MAX(Payment_Amount) AS Maximum_Sale
+FROM Payment
+WHERE Payment_Status = 'Paid';
+
+SELECT
+    COUNT(Payment_ID) AS Total_Payments,
+    SUM(Payment_Amount) AS Total_Sales
+FROM Payment
+WHERE Payment_Status = 'Paid';
+
+SELECT
+    c.Customer_ID,
+    c.Customer_Name,
+    COUNT(o.Order_ID) AS Total_Orders,
+    SUM(o.Quantity) AS Total_Quantity,
+    SUM(pay.Payment_Amount) AS Total_Purchase_Amount
+FROM Customer c
+INNER JOIN Orders o
+    ON c.Customer_ID = o.Customer_ID
+INNER JOIN Payment pay
+    ON o.Order_ID = pay.Order_ID
+WHERE pay.Payment_Status = 'Paid'
+GROUP BY c.Customer_ID, c.Customer_Name
+ORDER BY Total_Purchase_Amount DESC;
+
+SELECT
+    p.Product_ID,
+    p.Product_Name,
+    SUM(o.Quantity) AS Units_Sold,
+    SUM(pay.Payment_Amount) AS Total_Sales
+FROM Product p
+INNER JOIN Orders o
+    ON p.Product_ID = o.Product_ID
+INNER JOIN Payment pay
+    ON o.Order_ID = pay.Order_ID
+WHERE pay.Payment_Status = 'Paid'
+GROUP BY p.Product_ID, p.Product_Name
+ORDER BY Units_Sold DESC, Total_Sales DESC;
+
+SELECT
+    p.Category,
+    COUNT(DISTINCT o.Order_ID) AS Total_Orders,
+    SUM(o.Quantity) AS Units_Sold,
+    SUM(pay.Payment_Amount) AS Category_Sales,
+    AVG(pay.Payment_Amount) AS Average_Sale
+FROM Product p
+INNER JOIN Orders o
+    ON p.Product_ID = o.Product_ID
+INNER JOIN Payment pay
+    ON o.Order_ID = pay.Order_ID
+WHERE pay.Payment_Status = 'Paid'
+GROUP BY p.Category
+ORDER BY Category_Sales DESC;
