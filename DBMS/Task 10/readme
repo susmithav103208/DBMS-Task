@@ -1,13 +1,3 @@
-# Task X – Advanced SQL Query System
-
-## Objective
-Implement subqueries and nested queries to perform advanced product, customer, and business analysis using the existing Customer, Product, Orders, and Payment tables.
-
-## SQL Queries
-
-### 1. Products Above Average Price
-Find products whose price is greater than the average price of all products.
-
 ```sql
 USE DBMS;
 
@@ -22,12 +12,7 @@ WHERE Price > (
     FROM Product
 )
 ORDER BY Price DESC;
-```
 
-### 2. Customers with Maximum Purchases
-Find the customer or customers whose total paid purchase amount is the highest. The nested query also handles ties.
-
-```sql
 SELECT
     c.Customer_ID,
     c.Customer_Name,
@@ -51,12 +36,7 @@ HAVING SUM(p.Payment_Amount) = (
         GROUP BY o2.Customer_ID
     ) AS Customer_Purchases
 );
-```
 
-### 3. Products That Have Been Purchased
-Use the EXISTS operator with a correlated subquery to list products that have at least one order.
-
-```sql
 SELECT
     p.Product_ID,
     p.Product_Name,
@@ -68,12 +48,7 @@ WHERE EXISTS (
     FROM Orders o
     WHERE o.Product_ID = p.Product_ID
 );
-```
 
-### 4. Customers Spending Above the Average Customer Purchase
-Find customers whose total paid purchase amount is greater than the average total paid purchase amount per customer.
-
-```sql
 SELECT
     c.Customer_ID,
     c.Customer_Name,
@@ -98,12 +73,7 @@ HAVING SUM(p.Payment_Amount) > (
     ) AS Average_Customer_Purchases
 )
 ORDER BY Total_Purchase DESC;
-```
 
-### 5. Advanced Business Report
-Generate a product-wise report showing product details, units sold, paid sales, and comparison with the average product price. Products without paid orders are also included.
-
-```sql
 SELECT
     p.Product_ID,
     p.Product_Name,
@@ -140,15 +110,3 @@ GROUP BY
     p.Price
 ORDER BY Total_Paid_Sales DESC;
 ```
-
-## Concepts Used
-- Single-row subquery with AVG()
-- Nested subquery with MAX()
-- Correlated subquery with EXISTS
-- Derived tables
-- Aggregate functions with HAVING
-- CASE expression and COALESCE()
-- INNER JOIN and LEFT JOIN
-
-## Expected Outcome
-The queries identify products priced above the average, the highest-spending customer or customers, purchased products, customers spending above the average, and a product-wise business report. Only payments with status 'Paid' are counted as sales in the purchase analysis.
